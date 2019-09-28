@@ -4,6 +4,9 @@ import 'package:wechat/config/Palette.dart';
 
 class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double height = 100;
+
+  const ChatAppBar();
+
   @override
   Widget build(BuildContext context) {
     var textHeading = TextStyle(color: Palette.primaryTextColor, fontSize: 20); // Text style for the name
