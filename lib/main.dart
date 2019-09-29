@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'pages/ConversationPageSlide.dart';
+import 'pages/RegisterPage.dart';
 
 void main() => runApp(WeChat());
 
@@ -21,7 +21,7 @@ class WeChat extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.green,
       ),
-      home: ConversationPageSlide(),
+      home: RegisterPage(),
     );
   }
 }
