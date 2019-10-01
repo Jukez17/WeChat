@@ -1,58 +1,182 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:wechat/providers/AuthenticationProvider.dart';
-import 'package:wechat/utils/SharedObjects.dart';
+import 'package:wechat/blocs/authentication/authentication_bloc.dart';
+import 'package:wechat/blocs/authentication/authentication_event.dart';
+import 'package:wechat/blocs/authentication/authentication_state.dart';
+import 'package:wechat/models/User.dart';
 import 'package:mockito/mockito.dart';
+
 import '../mock/FirebaseMock.dart';
-import '../mock/SharedObjectsMock.dart';
+import '../mock/IOMock.dart';
+import '../mock/RepositoryMock.dart';
 
 void main() {
-  group('AuthenticationProvider', () {
-    //Mock and inject the basic dependencies in the AuthenticationProvider
-    FirebaseAuthMock firebaseAuth = FirebaseAuthMock();
-    GoogleSignInMock googleSignIn = GoogleSignInMock();
+  AuthenticationBloc authenticationBloc;
+  AuthenticationRepositoryMock authenticationRepository;
+  UserDataRepositoryMock userDataRepository;
+  StorageRepositoryMock storageRepository;
+  FirebaseUserMock firebaseUser;
+  User user;
+  MockFile file;
+  int age;
+  String username;
+  String profilePictureUrl;
 
-    AuthenticationProvider authenticationProvider = AuthenticationProvider(
-        firebaseAuth: firebaseAuth, googleSignIn: googleSignIn);
+  setUp(() {
+    userDataRepository = UserDataRepositoryMock();
+    authenticationRepository = AuthenticationRepositoryMock();
+    storageRepository = StorageRepositoryMock();
+    firebaseUser = FirebaseUserMock();
+    user = User();
+    file = MockFile();
+    age = 23;
+    username = 'jukkakoivu';
+    profilePictureUrl = 'http://www.github.com/adityadroid';
+    authenticationBloc = AuthenticationBloc(
+        userDataRepository: userDataRepository,
+        authenticationRepository: authenticationRepository,
+        storageRepository: storageRepository);
+  });
 
-    //Mock rest of the objects needed to replicate the AuthenticationProvider functions
-    final GoogleSignInAccountMock googleSignInAccount =
-        GoogleSignInAccountMock();
-    final GoogleSignInAuthenticationMock googleSignInAuthentication =
-        GoogleSignInAuthenticationMock();
-    final FirebaseUserMock firebaseUser = FirebaseUserMock();
-    SharedPreferencesMock sharedPreferencesMock = SharedPreferencesMock();
-    SharedObjects.prefs = sharedPreferencesMock;
+  test('initial state is always AuthInProgress', () {
+    expect(authenticationBloc.initialState, Uninitialized());
+  });
 
-    test('signInWithGoogle returns a Firebase user', () async {
-      //mock the method calls
-      when(sharedPreferencesMock.get(any)).thenReturn('uid');
-      when(googleSignIn.signIn()).thenAnswer(
-          (_) => Future<GoogleSignInAccountMock>.value(googleSignInAccount));
-      when(googleSignInAccount.authentication).thenAnswer((_) =>
-          Future<GoogleSignInAuthenticationMock>.value(
-              googleSignInAuthentication));
-      when(firebaseAuth.currentUser())
-          .thenAnswer((_) => Future<FirebaseUserMock>.value(firebaseUser));
+  //test the sequence of event emissions for different conditions
+  group('AppLaunched', () {
+    test('emits [Uninitialized -> Unauthenticated] when not logged in', () {
+      when(authenticationRepository.isLoggedIn())
+          .thenAnswer((_) => Future.value(false));
+      final expectedStates = [
+        Uninitialized(),
+        AuthInProgress(),
+        UnAuthenticated()
+      ];
+      expectLater(authenticationBloc.state, emitsInOrder(expectedStates));
 
-      //call the method and expect the Firebase user as return
-      expect(await authenticationProvider.signInWithGoogle(), firebaseUser);
-      verify(googleSignIn.signIn()).called(1);
-      verify(googleSignInAccount.authentication).called(1);
+      authenticationBloc.dispatch(AppLaunched());
+    });
+    test('emits [Uninitialized -> ProfileUpdated] when user is logged in and profile is complete', () {
+      when(authenticationRepository.isLoggedIn())
+          .thenAnswer((_) => Future.value(true));
+      when(authenticationRepository.getCurrentUser())
+          .thenAnswer((_) => Future.value(FirebaseUserMock()));
+      when(userDataRepository.isProfileComplete())
+          .thenAnswer((_) => Future.value(true));
+      final expectedStates = [
+        Uninitialized(),
+        AuthInProgress(),
+        ProfileUpdated()
+      ];
+      expectLater(authenticationBloc.state, emitsInOrder(expectedStates));
+
+      authenticationBloc.dispatch(AppLaunched());
+    });
+    test('emits [Uninitialized -> AuthInProgress -> Authenticated -> ProfileUpdateInProgress -> PreFillData] when user is logged in and profile is not complete', () {
+      when(authenticationRepository.isLoggedIn())
+          .thenAnswer((_) => Future.value(true));
+      when(authenticationRepository.getCurrentUser())
+          .thenAnswer((_) => Future.value(firebaseUser));
+      when(userDataRepository.isProfileComplete())
+          .thenAnswer((_) => Future.value(false));
+      final expectedStates = [
+        Uninitialized(),
+        AuthInProgress(),
+        Authenticated(firebaseUser),
+        ProfileUpdateInProgress(),
+        PreFillData(user)
+      ];
+      expectLater(authenticationBloc.state, emitsInOrder(expectedStates));
+
+      authenticationBloc.dispatch(AppLaunched());
+    });
+  });
+
+  group('ClickedGoogleLogin', () {
+    test('emits [AuthInProgress -> ProfileUpdated] when the user clicks Google Login button and after login result, the profile is complete', () {
+      when(authenticationRepository.signInWithGoogle())
+          .thenAnswer((_) => Future.value(firebaseUser));
+      when(userDataRepository.isProfileComplete())
+          .thenAnswer((_) => Future.value(true));
+      final expectedStates = [
+        Uninitialized(),
+        AuthInProgress(),
+        ProfileUpdated()
+      ];
+      expectLater(authenticationBloc.state, emitsInOrder(expectedStates));
+      authenticationBloc.dispatch(ClickedGoogleLogin());
     });
 
-    test('getCurrentUser returns current user', () async {
-      when(firebaseAuth.currentUser())
-          .thenAnswer((_) => Future<FirebaseUserMock>.value(firebaseUser));
-      expect(await authenticationProvider.getCurrentUser(), firebaseUser);
+    test('emits [AuthInProgress -> Authenticated -> ProfileUpdateInProgress -> PreFillData] when the user clicks Google Login button and after login result, the profile is found to be incomplete', () {
+      when(authenticationRepository.signInWithGoogle())
+          .thenAnswer((_) => Future.value(firebaseUser));
+      when(userDataRepository.isProfileComplete())
+          .thenAnswer((_) => Future.value(false));
+      final expectedStates = [
+        Uninitialized(),
+        AuthInProgress(),
+        Authenticated(firebaseUser),
+        ProfileUpdateInProgress(),
+        PreFillData(user)
+      ];
+      expectLater(authenticationBloc.state, emitsInOrder(expectedStates));
+      authenticationBloc.dispatch(ClickedGoogleLogin());
     });
+  });
 
-    test('isLoggedIn return true only when FirebaseAuth has a user', () async {
-      when(firebaseAuth.currentUser())
-          .thenAnswer((_) => Future<FirebaseUserMock>.value(firebaseUser));
-      expect(await authenticationProvider.isLoggedIn(), true);
-      when(firebaseAuth.currentUser())
-          .thenAnswer((_) => Future<FirebaseUserMock>.value(null));
-      expect(await authenticationProvider.isLoggedIn(), false);
+  group('LoggedIn', () {
+    test('emits [ProfileUpdateInProgress -> PreFillData] when trigged, this event is trigged once gauth is done and profile is not complete', () {
+      when(userDataRepository.saveDetailsFromGoogleAuth(firebaseUser))
+          .thenAnswer((_) => Future.value(user));
+      final expectedStates = [
+        Uninitialized(),
+        ProfileUpdateInProgress(),
+        PreFillData(user)
+      ];
+      expectLater(authenticationBloc.state, emitsInOrder(expectedStates));
+
+      authenticationBloc.dispatch(LoggedIn(firebaseUser));
     });
+  });
+
+  group('PickedProfilePicture', () {
+    test('emits [ReceivedProfilePicture] everytime', () {
+      final expectedStates = [Uninitialized(), ReceivedProfilePicture(file)];
+      expectLater(authenticationBloc.state, emitsInOrder(expectedStates));
+      authenticationBloc.dispatch(PickedProfilePicture(file));
+    });
+  });
+
+  group('SaveProfile', () {
+    test('emits [ProfileUpdateInProgress -> ProfileUpdated] everytime SaveProfile is dispatched', () {
+      when(storageRepository.uploadFile(any, any))
+          .thenAnswer((_) => Future.value(profilePictureUrl));
+      when(authenticationRepository.getCurrentUser())
+          .thenAnswer((_) => Future.value(firebaseUser));
+      when(userDataRepository.saveProfileDetails(any, any, any, any))
+          .thenAnswer((_) => Future.value(user));
+      final expectedStates = [
+        Uninitialized(),
+        ProfileUpdateInProgress(),
+        ProfileUpdated()
+      ];
+      expectLater(authenticationBloc.state, emitsInOrder(expectedStates));
+      authenticationBloc.dispatch(SaveProfile(file, age, username));
+    });
+  });
+
+  group('ClickedLogout', () {
+    test('emits [UnAuthenticated] when clicked logout', () {
+      final expectedStates = [Uninitialized(), UnAuthenticated()];
+      expectLater(authenticationBloc.state, emitsInOrder(expectedStates));
+      authenticationBloc.dispatch(ClickedLogout());
+    });
+  });
+
+  test('emits no states after calling dispose', () {
+    expectLater(
+      authenticationBloc.state,
+      emitsInOrder([]),
+    );
+    authenticationBloc.dispose();
   });
 }

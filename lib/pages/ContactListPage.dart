@@ -7,7 +7,9 @@ import 'package:wechat/config/Assets.dart';
 import 'package:wechat/config/Decorations.dart';
 import 'package:wechat/config/Palette.dart';
 import 'package:wechat/config/Styles.dart';
+import 'package:wechat/config/Transitions.dart';
 import 'package:wechat/models/Contact.dart';
+import 'package:wechat/pages/ConversationPageSlide.dart';
 import 'package:wechat/widgets/BottomSheet.dart';
 import 'package:wechat/widgets/ContactRowWidget.dart';
 import 'package:wechat/widgets/GradientFab.dart';
@@ -76,6 +78,8 @@ class _ContactListPageState extends State<ContactListPage>
                       behavior: SnackBarBehavior.floating,
                       content: Text(state.exception.errorMessage()));
                   Scaffold.of(bc).showSnackBar(snackBar);
+                }else if (state is ClickedContactState){
+                  Navigator.push(context,SlideLeftRoute(page: ConversationPageSlide(startContact: state.contact)));
                 }
               },
               child: Stack(
