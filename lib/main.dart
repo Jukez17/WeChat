@@ -1,27 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wechat/pages/ConversationPageSlide.dart';
+import 'package:wechat/repositories/AuthenticationRepository.dart';
+import 'package:wechat/repositories/StorageRepository.dart';
+import 'package:wechat/repositories/UserDataRepository.dart';
+import 'config/Palette.dart';
 import 'pages/RegisterPage.dart';
+import 'blocs/authentication/Bloc.dart';
 
-void main() => runApp(WeChat());
+void main() {
+  //create instances of the repositories to supply them to the app
+  final AuthenticationRepository authRepository = AuthenticationRepository();
+  final UserDataRepository userDataRepository = UserDataRepository();
+  final StorageRepository storageRepository = StorageRepository();
+  runApp(
+    BlocProvider(
+      builder: (context) => AuthenticationBloc(
+          authenticationRepository: authRepository,
+          userDataRepository: userDataRepository,
+          storageRepository: storageRepository)
+        ..dispatch(AppLaunched()),
+      child: WeChat(),
+    ),
+  );
+}
 
 class WeChat extends StatelessWidget {
-  // This widget is the root of your application.
+
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'WeChat',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.green,
+        primaryColor: Palette.primaryColor,
       ),
-      home: RegisterPage(),
+      home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+        builder: (context, state) {
+          if (state is UnAuthenticated) {
+            return RegisterPage();
+          } else if (state is ProfileUpdated) {
+            return ConversationPageSlide();
+          } else {
+            return RegisterPage();
+          }
+        },
+      ),
     );
   }
 }

@@ -7,13 +7,9 @@
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:wechat/main.dart';
-import 'package:wechat/pages/RegisterPage.dart';
-
 void main() {
   testWidgets('Main UI Test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(WeChat());
-    expect(find.byType(RegisterPage), findsOneWidget);
+
   });
 }
