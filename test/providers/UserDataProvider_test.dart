@@ -1,11 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wechat/models/User.dart';
 import 'package:wechat/providers/UserDataProvider.dart';
+import 'package:wechat/utils/SharedObjects.dart';
 import 'package:mockito/mockito.dart';
 
 import '../mock/FirebaseMock.dart';
+import '../mock/SharedObjectsMock.dart';
 
 void main() {
+
   group('UserDataProvider', () {
     FireStoreMock fireStore = FireStoreMock();
     UserDataProvider userDataProvider =
@@ -14,6 +17,8 @@ void main() {
     CollectionReferenceMock collectionReference = CollectionReferenceMock();
     DocumentSnapshotMock documentSnapshot = DocumentSnapshotMock();
     DocumentReferenceMock documentReference = DocumentReferenceMock();
+    SharedPreferencesMock sharedPreferencesMock = SharedPreferencesMock();
+    SharedObjects.prefs = sharedPreferencesMock;
 
     test(
         'saveDetailsFromGoogleAuth returns a user with the details from FirebaseUser Object passed',
@@ -36,6 +41,8 @@ void main() {
     test(
         'saveDetailsFromGoogleAuth if there is not existing image write the image from firebase user',
         () async {
+          when(SharedObjects.prefs.get(any)).thenReturn('uid');
+          when(SharedObjects.prefs.get(any)).thenReturn('');
       documentReference = DocumentReferenceMock();
       when(fireStore.collection(any)).thenReturn(collectionReference);
       when(collectionReference.document(any)).thenReturn(documentReference);
@@ -51,10 +58,12 @@ void main() {
     test(
         'saveDetailsFromGoogleAuth if there is existing image, do not write the image from firebase user',
         () async {
+
       documentSnapshot.data['photoUrl'] =
           'http://www.google.com'; //create a snapshot first to mock existing user
       documentReference =
           DocumentReferenceMock(documentSnapshotMock: documentSnapshot);
+      when(SharedObjects.prefs.get(any)).thenReturn('uid');
       when(fireStore.collection(any)).thenReturn(collectionReference);
       when(collectionReference.document(any)).thenReturn(documentReference);
       expect(await documentReference.snapshots().isEmpty,
@@ -68,12 +77,12 @@ void main() {
     });
 
     test('saveProfileDetails saves the details', () async {
+      when(sharedPreferencesMock.get(any)).thenReturn('uid');
       documentReference = DocumentReferenceMock(); //create a user
       when(fireStore.collection(any)).thenReturn(collectionReference);
       when(collectionReference.document(any)).thenReturn(documentReference);
       expect(await documentReference.snapshots().isEmpty, true);
-      User user = await userDataProvider.saveProfileDetails(
-          'uid', 'http://www.github.com', 18, 'jukkakoivu');
+      User user = await userDataProvider.saveProfileDetails('http://www.github.com', 18, 'jukkakoivu');
       expect(await documentReference.snapshots().isEmpty, false);
       expect(user.age, 18); // checking if passed data is saved
       expect(user.username, 'jukkakoivu');
@@ -85,11 +94,12 @@ void main() {
       documentReference =
           DocumentReferenceMock(documentSnapshotMock: documentSnapshot);
       documentReference.setData({'username': 'jukkakoivu', 'age': 18});
+      when(sharedPreferencesMock.get(any)).thenReturn('uid');
       when(fireStore.collection(any)).thenReturn(collectionReference);
       when(collectionReference.document(any)).thenReturn(documentReference);
       when(documentSnapshot.exists).thenReturn(true);
       expect(await documentReference.snapshots().isEmpty, false);
-      expect(await userDataProvider.isProfileComplete('uid'), true);
+      expect(await userDataProvider.isProfileComplete(), true);
 
       //clear profile data. Shoudl return false now
       documentReference = DocumentReferenceMock();
@@ -97,7 +107,7 @@ void main() {
       when(collectionReference.document(any)).thenReturn(documentReference);
       when(documentSnapshot.exists).thenReturn(true);
       expect(await documentReference.snapshots().isEmpty, true);
-      expect(await userDataProvider.isProfileComplete('uid'), false);
+      expect(await userDataProvider.isProfileComplete(), false);
     });
   });
 }

@@ -5,10 +5,11 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:wechat/config/Assets.dart';
+import 'package:wechat/config/Decorations.dart';
 import 'package:wechat/config/Palette.dart';
 import 'package:wechat/config/Styles.dart';
 import 'package:wechat/config/Transitions.dart';
-import 'package:wechat/pages/ConversationPageSlide.dart';
+import 'package:wechat/pages/ContactListPage.dart';
 import 'package:wechat/widgets/CircleIndicator.dart';
 import 'package:wechat/widgets/NumberPicker.dart';
 import 'package:wechat/blocs/authentication/Bloc.dart';
@@ -16,6 +17,7 @@ import 'package:wechat/blocs/authentication/Bloc.dart';
 class RegisterPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
+    // TODO: implement createState
     return _RegisterPageState();
   }
 }
@@ -183,7 +185,7 @@ class _RegisterPageState extends State<RegisterPage>
           child: Image.asset(Assets.app_icon_fg, height: 100)),
       Container(
           margin: EdgeInsets.only(top: 30),
-          child: Text('WeChat Messenger',
+          child: Text('wechat Messenger',
               style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -311,17 +313,8 @@ class _RegisterPageState extends State<RegisterPage>
           style: Styles.subHeadingLight,
           focusNode: usernameFocusNode,
           controller: usernameController,
-          decoration: InputDecoration(
-            hintText: '@username',
-            hintStyle: Styles.hintTextLight,
-            contentPadding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Palette.primaryColor, width: 0.1),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Palette.primaryColor, width: 0.1),
-            ),
-          ),
+          decoration: Decorations.getInputDecoration(
+              hint: '@username', isPrimary: false),
         ));
   }
 
@@ -388,7 +381,7 @@ class _RegisterPageState extends State<RegisterPage>
   navigateToHome() {
     Navigator.push(
       context,
-      SlideLeftRoute(page: ConversationPageSlide()),
+      SlideLeftRoute(page: ContactListPage()),
     );
   }
 
