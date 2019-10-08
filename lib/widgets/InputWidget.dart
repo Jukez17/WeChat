@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wechat/blocs/chats/Bloc.dart';
 import 'package:wechat/config/Palette.dart';
 import 'package:wechat/pages/ConversationBottomSheet.dart';
 
@@ -6,7 +8,6 @@ class InputWidget extends StatelessWidget {
   final TextEditingController textEditingController = TextEditingController();
 
   InputWidget();
-
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -15,17 +16,17 @@ class InputWidget extends StatelessWidget {
       child: Row(
         children: <Widget>[
           Material(
-            child: new Container(
-              margin: new EdgeInsets.symmetric(horizontal: 1.0),
-              child: new IconButton(
-                icon: new Icon(Icons.face),
-                color: Colors.green,
+            child:  Container(
+              margin:  EdgeInsets.symmetric(horizontal: 1.0),
+              child:  IconButton(
+                icon:  Icon(Icons.face),
+                color: Palette.accentColor,
                 onPressed: () => {
                   showModalBottomSheet(
                       context: context,
                       builder: (BuildContext bc) {
                         return Container(
-                          child: new Wrap(
+                          child:  Wrap(
                             children: <Widget>[
                               ConversationBottomSheet()
                             ],
@@ -47,7 +48,7 @@ class InputWidget extends StatelessWidget {
                     TextStyle(color: Palette.primaryTextColor, fontSize: 15.0),
                 controller: textEditingController,
                 decoration: InputDecoration.collapsed(
-                  hintText: 'Write a message',
+                  hintText: 'Type a message',
                   hintStyle: TextStyle(color: Palette.greyColor),
                 ),
               ),
@@ -56,12 +57,12 @@ class InputWidget extends StatelessWidget {
 
           // Send Message Button
           Material(
-            child: new Container(
-              margin: new EdgeInsets.symmetric(horizontal: 8.0),
-              child: new IconButton(
-                icon: new Icon(Icons.send),
-                onPressed: () => {},
-                color: Colors.green,
+            child:  Container(
+              margin: EdgeInsets.symmetric(horizontal: 8.0),
+              child:  IconButton(
+                icon:  Icon(Icons.send),
+                onPressed: () => sendMessage(context),
+                color: Palette.accentColor,
               ),
             ),
             color: Colors.white,
@@ -70,10 +71,15 @@ class InputWidget extends StatelessWidget {
       ),
       width: double.infinity,
       height: 50.0,
-      decoration: new BoxDecoration(
-          border: new Border(
-              top: new BorderSide(color: Palette.greyColor, width: 0.5)),
+      decoration:  BoxDecoration(
+          border:  Border(
+              top:  BorderSide(color: Palette.greyColor, width: 0.5)),
           color: Colors.white),
     ));
+  }
+  
+  void sendMessage(context){
+    BlocProvider.of<ChatBloc>(context).dispatch(SendTextMessageEvent(textEditingController.text));
+    textEditingController.clear();
   }
 }

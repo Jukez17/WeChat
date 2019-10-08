@@ -39,15 +39,15 @@ void main() {
       documentSnapshot = await documentReference.get();
       expect(documentSnapshot.data['uid'],
           'uid'); //checking if the data from the passed FirebaseUser object is returned in User
-      expect(user.name, 'Jukka Koivu');
+      expect(user.name, 'John Doe');
       expect(user.photoUrl, 'http://www.adityag.me');
     });
 
     test(
         'saveDetailsFromGoogleAuth if there is not existing image write the image from firebase user',
         () async {
-          when(SharedObjects.prefs.get(any)).thenReturn('uid');
-          when(SharedObjects.prefs.get(any)).thenReturn('');
+          when(SharedObjects.prefs.getString(any)).thenReturn('uid');
+          when(SharedObjects.prefs.getString(any)).thenReturn('');
           when(SharedObjects.prefs.setString(any, any)).thenAnswer((_)=>Future.value(true));
           documentReference = DocumentReferenceMock();
       when(fireStore.collection(any)).thenReturn(collectionReference);
@@ -56,7 +56,7 @@ void main() {
           true); //no data is saved, fresh user
       User user =
           await userDataProvider.saveDetailsFromGoogleAuth(FirebaseUserMock());
-      expect(user.name, 'Jukka Koivu');
+      expect(user.name, 'John Doe');
       expect(user.photoUrl,
           'http://www.adityag.me'); //image from FirebaseUser object is written
     });
@@ -69,7 +69,7 @@ void main() {
           'http://www.google.com'; //create a snapshot first to mock existing user
       documentReference =
           DocumentReferenceMock(documentSnapshotMock: documentSnapshot);
-      when(SharedObjects.prefs.get(any)).thenReturn('uid');
+      when(SharedObjects.prefs.getString(any)).thenReturn('uid');
       when(SharedObjects.prefs.setString(any, any)).thenAnswer((_)=>Future.value(true));
       when(fireStore.collection(any)).thenReturn(collectionReference);
       when(collectionReference.document(any)).thenReturn(documentReference);
@@ -78,22 +78,22 @@ void main() {
       User user =
           await userDataProvider.saveDetailsFromGoogleAuth(FirebaseUserMock());
       expect(await documentReference.snapshots().isEmpty, false);
-      expect(user.name, 'Jukka Koivu');
+      expect(user.name, 'John Doe');
       expect(user.photoUrl,
           'http://www.google.com'); // for existing user the image is not overwritten.
     });
 
     test('saveProfileDetails saves the details', () async {
       when(SharedObjects.prefs.setString(any, any)).thenAnswer((_)=>Future.value(true));
-      when(sharedPreferencesMock.get(any)).thenReturn('uid');
+      when(sharedPreferencesMock.getString(any)).thenReturn('uid');
       documentReference = DocumentReferenceMock(); //create a user
       when(fireStore.collection(any)).thenReturn(collectionReference);
       when(collectionReference.document(any)).thenReturn(documentReference);
       expect(await documentReference.snapshots().isEmpty, true);
-      User user = await userDataProvider.saveProfileDetails('http://www.github.com', 18, 'jukkakoivu');
+      User user = await userDataProvider.saveProfileDetails('http://www.github.com', 18, 'johndoe');
       expect(await documentReference.snapshots().isEmpty, false);
       expect(user.age, 18); // checking if passed data is saved
-      expect(user.username, 'jukkakoivu');
+      expect(user.username, 'johndoe');
       expect(user.photoUrl, 'http://www.github.com');
     });
 
@@ -102,8 +102,8 @@ void main() {
       when(SharedObjects.prefs.setString(any, any)).thenAnswer((_)=>Future.value(true));
       documentReference =
           DocumentReferenceMock(documentSnapshotMock: documentSnapshot);
-      documentReference.setData({'username': 'jukkakoivu', 'age': 18});
-      when(sharedPreferencesMock.get(any)).thenReturn('uid');
+      documentReference.setData({'username': 'johndoe', 'age': 18});
+      when(sharedPreferencesMock.getString(any)).thenReturn('uid');
       when(fireStore.collection(any)).thenReturn(collectionReference);
       when(collectionReference.document(any)).thenReturn(documentReference);
       when(documentSnapshot.exists).thenReturn(true);
@@ -120,8 +120,8 @@ void main() {
     });
 
     test('Add Contacts fails if username already exists',() async{
-      String username = 'jukkakoivu'; //arbitrary username
-      when(sharedPreferencesMock.get(any)).thenReturn('uid'); //mock the sharedprefs
+      String username = 'johndoe'; //arbitrary username
+      when(sharedPreferencesMock.getString(any)).thenReturn('uid'); //mock the sharedprefs
       documentSnapshot = DocumentSnapshotMock();  //mock documentsnapshot
       when(documentSnapshot.exists).thenReturn(true); // this is done to pass the getUidByUsername method
       documentReference = DocumentReferenceMock(documentSnapshotMock: documentSnapshot);
@@ -136,7 +136,7 @@ void main() {
     });
 
     test('getContacts returns a empty list when there is no contact',() async{
-      when(sharedPreferencesMock.get(any)).thenReturn('uid'); //mock the sharedprefs
+      when(sharedPreferencesMock.getString(any)).thenReturn('uid'); //mock the sharedprefs
       DocumentSnapshotMock contactSnapshot = DocumentSnapshotMock();  //mock documentsnapshot
       DocumentSnapshotMock userSnapshot = DocumentSnapshotMock();
       DocumentSnapshotMock mappingSnapshot = DocumentSnapshotMock();
@@ -145,16 +145,16 @@ void main() {
       when(mappingSnapshot.exists).thenReturn(true);
 
       contactSnapshot.mockData = Map<String,dynamic>.from({
-        'name':'Jukka Koivu',
+        'name':'John Doe',
         'uid' : 'john',
-        'username':'jukkakoivu'
+        'username':'johndoe'
       });
       when(contactSnapshot.documentID).thenReturn('documentId');
       userSnapshot.mockData = Map<String,dynamic>.from({
         'name' : 'Roger',
         'username' : 'roger',
         'uid': 'uid',
-        'contacts': ['jukkakoivu']
+        'contacts': ['johndoe']
       });
       mappingSnapshot.mockData = Map<String,dynamic>.from({
         'uid': 'john'
@@ -166,7 +166,7 @@ void main() {
       CollectionReferenceMock mappingCollection = CollectionReferenceMock();
       when(userCollection.document('uid')).thenReturn(userRef);
       when(userCollection.document('john')).thenReturn(contactRef);
-      when(mappingCollection.document('jukkakoivu')).thenReturn(mappingRef);
+      when(mappingCollection.document('johndoe')).thenReturn(mappingRef);
       when(fireStore.collection('/users')).thenReturn(userCollection);
       when(fireStore.collection('/username_uid_map')).thenReturn(mappingCollection);
       StreamController streamController = StreamController<List<Contact>>();
@@ -180,7 +180,7 @@ void main() {
     });
 
     test('mapDocumentToContact mapping works properly',()async {
-      when(sharedPreferencesMock.get(any)).thenReturn('uid'); //mock the sharedprefs
+      when(sharedPreferencesMock.getString(any)).thenReturn('uid'); //mock the sharedprefs
       DocumentSnapshotMock contactSnapshot = DocumentSnapshotMock();  //mock documentsnapshot
       DocumentSnapshotMock userSnapshot = DocumentSnapshotMock();
       DocumentSnapshotMock mappingSnapshot = DocumentSnapshotMock();
@@ -189,16 +189,16 @@ void main() {
       when(mappingSnapshot.exists).thenReturn(true);
 
       contactSnapshot.mockData = Map<String,dynamic>.from({
-        'name':'Jukka Koivu',
+        'name':'John Doe',
         'uid' : 'john',
-        'username':'jukkakoivu'
+        'username':'johndoe'
       });
       when(contactSnapshot.documentID).thenReturn('documentId');
       userSnapshot.mockData = Map<String,dynamic>.from({
         'name' : 'Roger',
         'username' : 'roger',
         'uid': 'uid',
-        'contacts': ['jukkakoivu']
+        'contacts': ['johndoe']
       });
       mappingSnapshot.mockData = Map<String,dynamic>.from({
         'uid': 'john'
@@ -210,7 +210,7 @@ void main() {
       CollectionReferenceMock mappingCollection = CollectionReferenceMock();
       when(userCollection.document('uid')).thenReturn(userRef);
       when(userCollection.document('john')).thenReturn(contactRef);
-      when(mappingCollection.document('jukkakoivu')).thenReturn(mappingRef);
+      when(mappingCollection.document('johndoe')).thenReturn(mappingRef);
       when(fireStore.collection('/users')).thenReturn(userCollection);
       when(fireStore.collection('/username_uid_map')).thenReturn(mappingCollection);
       StreamController streamController = StreamController<List<Contact>>();
