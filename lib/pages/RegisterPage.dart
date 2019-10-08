@@ -28,6 +28,8 @@ class _RegisterPageState extends State<RegisterPage>
   //fields for the form
   File profileImageFile;
   ImageProvider profileImage;
+
+
   int age = 18;
   final TextEditingController usernameController = TextEditingController();
 
@@ -222,8 +224,10 @@ class _RegisterPageState extends State<RegisterPage>
           profileImage = Image.asset(Assets.user).image;
           if (state is PreFillData) {
             age = state.user.age != null ? state.user.age : 18;
+            if (state.user.photoUrl != null) {
             profileImage = Image.network(state.user.photoUrl).image;
-          } else if (state is ReceivedProfilePicture) {
+		}          
+	  } else if (state is ReceivedProfilePicture) {
             profileImageFile = state.file;
             profileImage = Image.file(profileImageFile).image;
           }
