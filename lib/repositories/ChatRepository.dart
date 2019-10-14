@@ -3,17 +3,20 @@ import 'dart:async';
 import 'package:wechat/models/Chat.dart';
 import 'package:wechat/models/Message.dart';
 import 'package:wechat/models/User.dart';
+import 'package:wechat/providers/BaseProviders.dart';
 import 'package:wechat/providers/ChatProvider.dart';
 
 
 class ChatRepository{
-  ChatProvider chatProvider = ChatProvider();
+  BaseChatProvider chatProvider = ChatProvider();
   Stream<List<Chat>> getChats() => chatProvider.getChats();
   Stream<List<Message>> getMessages(String chatId)=> chatProvider.getMessages(chatId);
 
   Future<List<Message>> getPreviousMessages(
           String chatId, Message prevMessage) =>
       chatProvider.getPreviousMessages(chatId, prevMessage);
+
+  Future<List<Message>> getAttachments(String chatId, int type) => chatProvider.getAttachments(chatId, type);
 
   Future<void> sendMessage(String chatId, Message message)=>chatProvider.sendMessage(chatId, message);
 
@@ -22,6 +25,4 @@ class ChatRepository{
 
   Future<void> createChatIdForContact(User user) =>
       chatProvider.createChatIdForContact(user);
-
-
 }

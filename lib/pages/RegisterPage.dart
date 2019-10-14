@@ -17,7 +17,6 @@ import 'package:wechat/blocs/authentication/Bloc.dart';
 class RegisterPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return _RegisterPageState();
   }
 }
@@ -185,7 +184,7 @@ class _RegisterPageState extends State<RegisterPage>
           child: Image.asset(Assets.app_icon_fg, height: 100)),
       Container(
           margin: EdgeInsets.only(top: 30),
-          child: Text('wechat Messenger',
+          child: Text('WeChat Messenger',
               style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,

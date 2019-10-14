@@ -1,13 +1,10 @@
-import 'dart:io';
-
-import 'package:downloads_path_provider/downloads_path_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:wechat/config/Assets.dart';
 import 'package:wechat/config/Palette.dart';
 import 'package:intl/intl.dart';
 import 'package:wechat/config/Styles.dart';
 import 'package:wechat/models/Message.dart';
+import 'package:wechat/utils/SharedObjects.dart';
 import 'package:wechat/widgets/BottomSheet.dart';
 import 'VideoPlayerWidget.dart';
 
@@ -18,7 +15,6 @@ class ChatItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     //This is the sent message. We'll later use data from firebase instead of index to determine the message is sent or received.
     final isSelf = message.isSelf;
     return Container(
@@ -127,7 +123,6 @@ class ChatItemWidget extends StatelessWidget {
               alignment: AlignmentDirectional.center,
               children: <Widget>[
                 Container(
-                  width: 130,
                   color: Palette.secondaryColor,
                   height: 80,
                 ),
@@ -141,9 +136,9 @@ class ChatItemWidget extends StatelessWidget {
                       height: 5,
                     ),
                     Text(
-                      'File',
+                      message.fileName,
                       style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 14,
                           color: isSelf
                               ? Palette.selfMessageColor
                               : Palette.otherMessageColor),
@@ -161,7 +156,7 @@ class ChatItemWidget extends StatelessWidget {
                           ? Palette.selfMessageColor
                           : Palette.otherMessageColor,
                     ),
-                    onPressed: () => downloadFile(message.fileUrl)))
+                    onPressed: () => SharedObjects.downloadFile(message.fileUrl,message.fileName)))
           ],
         ),
       );
@@ -195,20 +190,5 @@ class ChatItemWidget extends StatelessWidget {
          return VideoPlayerWidget(videoUrl);
         });
   }
-
-  /*
-  Supporting only for android for now
-   */
-  downloadFile(String fileUrl) async {
-    final Directory downloadsDirectory = await DownloadsPathProvider.downloadsDirectory;
-    final String downloadsPath = downloadsDirectory.path;
-    await FlutterDownloader.enqueue(
-      url: fileUrl,
-      savedDir: downloadsPath,
-      showNotification: true, // show download progress in status bar (for Android)
-      openFileFromNotification: true, // click on notification to open downloaded file (for Android)
-    );
-  }
-
 
 }
