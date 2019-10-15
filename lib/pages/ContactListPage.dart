@@ -5,9 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wechat/blocs/contacts/Bloc.dart';
 import 'package:wechat/config/Assets.dart';
 import 'package:wechat/config/Decorations.dart';
-import 'package:wechat/config/Transitions.dart';
 import 'package:wechat/models/Contact.dart';
-import 'package:wechat/pages/ConversationPageSlide.dart';
 import 'package:wechat/widgets/BottomSheet.dart';
 import 'package:wechat/widgets/ContactRowWidget.dart';
 import 'package:wechat/widgets/GradientFab.dart';
@@ -54,10 +52,7 @@ class _ContactListPageState extends State<ContactListPage>
     return SafeArea(
       child: Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
-        body: BlocProvider<ContactsBloc>(
-            builder: (context) => contactsBloc,
-            child: BlocListener<ContactsBloc, ContactsState>(
-              bloc: contactsBloc,
+        body: BlocListener<ContactsBloc, ContactsState>(
               listener: (bc, state) {
                 print(state);
                 if (state is AddContactSuccessState) {
@@ -68,8 +63,6 @@ class _ContactListPageState extends State<ContactListPage>
                 } else if (state is AddContactFailedState) {
                   Navigator.pop(context);
                   GradientSnackBar.showError(context, state.exception.errorMessage());
-                }else if (state is ClickedContactState){
-                  Navigator.push(context,SlideLeftRoute(page: ConversationPageSlide(startContact: state.contact)));
                 }
               },
               child: Stack(
@@ -121,7 +114,7 @@ class _ContactListPageState extends State<ContactListPage>
                   ),
                 ],
               ),
-            )),
+            ),
         floatingActionButton: GradientFab(
           child: Icon(Icons.add, color: Theme.of(context).primaryColor,),
           animation: animation,

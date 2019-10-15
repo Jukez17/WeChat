@@ -55,12 +55,14 @@ void main() async {
         builder: (context) => HomeBloc(chatRepository: chatRepository),
       ),
       BlocProvider<ConfigBloc>(
-        builder: (context) => ConfigBloc(),
+        builder: (context) => ConfigBloc(storageRepository: storageRepository,userDataRepository: userDataRepository),
       )
     ],
     child: WeChat(),
   ));
 }
+
+
 
 // ignore: must_be_immutable
 class WeChat extends StatelessWidget {
@@ -87,7 +89,8 @@ class WeChat extends StatelessWidget {
             if (state is UnAuthenticated) {
               return RegisterPage();
             } else if (state is ProfileUpdated) {
-              BlocProvider.of<ChatBloc>(context).dispatch(FetchChatListEvent());
+              if(SharedObjects.prefs.getBool(Constants.configMessagePaging))
+                BlocProvider.of<ChatBloc>(context).dispatch(FetchChatListEvent());
               return HomePage();
               //  return ConversationPageSlide();
             } else {

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:wechat/config/Assets.dart';
 import 'package:wechat/config/Palette.dart';
@@ -5,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:wechat/models/Message.dart';
 import 'package:wechat/utils/SharedObjects.dart';
 import 'package:wechat/widgets/BottomSheet.dart';
+import 'package:wechat/widgets/ImageFullScreenWidget.dart';
 import 'VideoPlayerWidget.dart';
 
 class ChatItemWidget extends StatelessWidget {
@@ -61,9 +63,15 @@ class ChatItemWidget extends StatelessWidget {
                 isSelf ? Palette.selfMessageColor : Palette.otherMessageColor),
       );
     } else if (message is ImageMessage) {
-      return ClipRRect(
-          borderRadius: BorderRadius.circular(8.0),
-          child: FadeInImage(placeholder: AssetImage(Assets.placeholder), image: NetworkImage(message.imageUrl)));
+      return GestureDetector(
+        onTap: ()=> Navigator.push(context, MaterialPageRoute(builder: (_) => ImageFullScreen('ImageMessage_${message.documentId}',message.imageUrl))),
+        child: Hero(
+          tag: 'ImageMessage_${message.documentId}',
+          child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: CachedNetworkImage(imageUrl:message.imageUrl, placeholder: (_,url)=>Image.asset(Assets.placeholder))),
+        ),
+      );
     } else if (message is VideoMessage) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(8.0),
@@ -189,8 +197,5 @@ class ChatItemWidget extends StatelessWidget {
          return VideoPlayerWidget(videoUrl);
         });
   }
-
-
-
 
 }
