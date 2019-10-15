@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:wechat/config/Assets.dart';
 import 'package:wechat/config/Palette.dart';
 import 'package:intl/intl.dart';
-import 'package:wechat/config/Styles.dart';
 import 'package:wechat/models/Message.dart';
 import 'package:wechat/utils/SharedObjects.dart';
 import 'package:wechat/widgets/BottomSheet.dart';
@@ -20,7 +19,7 @@ class ChatItemWidget extends StatelessWidget {
     return Container(
         child: Column(children: <Widget>[
       buildMessageContainer(isSelf, message, context),
-      buildTimeStamp(isSelf, message)
+      buildTimeStamp(context,isSelf, message)
     ]));
   }
 
@@ -163,7 +162,7 @@ class ChatItemWidget extends StatelessWidget {
     }
   }
 
-  Row buildTimeStamp(bool isSelf, Message message) {
+  Row buildTimeStamp(BuildContext context, bool isSelf, Message message) {
     return Row(
         mainAxisAlignment:
             isSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -172,7 +171,7 @@ class ChatItemWidget extends StatelessWidget {
             child: Text(
               DateFormat('dd MMM kk:mm').format(
                   DateTime.fromMillisecondsSinceEpoch(message.timeStamp)),
-              style: Styles.date,
+              style: Theme.of(context).textTheme.caption,
             ),
             margin: EdgeInsets.only(
                 left: isSelf ? 5.0 : 0.0,
@@ -190,5 +189,8 @@ class ChatItemWidget extends StatelessWidget {
          return VideoPlayerWidget(videoUrl);
         });
   }
+
+
+
 
 }

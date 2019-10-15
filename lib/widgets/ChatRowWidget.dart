@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:wechat/config/Palette.dart';
-import 'package:wechat/config/Styles.dart';
 import 'package:wechat/config/Transitions.dart';
 import 'package:wechat/models/Contact.dart';
 import 'package:wechat/models/Conversation.dart';
@@ -22,6 +21,7 @@ class ChatRowWidget extends StatelessWidget {
               page: ConversationPageSlide(
                   startContact: Contact.fromConversation(conversation)))),
       child: Container(
+        color: Theme.of(context).primaryColor,
           padding: EdgeInsets.fromLTRB(15, 10, 0, 10),
           child: Row(
             children: <Widget>[
@@ -31,7 +31,7 @@ class ChatRowWidget extends StatelessWidget {
                   mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
                     Container(
-                        child:  CircleAvatar(
+                        child: CircleAvatar(
                           radius: 30,
                           backgroundImage: Image.network(
                             conversation.user.photoUrl,
@@ -41,20 +41,18 @@ class ChatRowWidget extends StatelessWidget {
                         height: 61.0,
                         padding: const EdgeInsets.all(1.0), // borde width
                         decoration: new BoxDecoration(
-                          color: Palette.accentColor, // border color
+                          color:Theme.of(context).accentColor, // border color
                           shape: BoxShape.circle,
-                        )
-                    )
-                   ,
+                        )),
                     SizedBox(
                       width: 15,
                     ),
                     Container(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text(conversation.user.name, style: Styles.subHeading),
-                        messageContent(conversation.latestMessage)
+                        Text(conversation.user.name, style: Theme.of(context).textTheme.body1),
+                        messageContent(context, conversation.latestMessage)
                       ],
                     ))
                   ],
@@ -70,7 +68,7 @@ class ChatRowWidget extends StatelessWidget {
                       DateFormat('kk:mm').format(
                           DateTime.fromMillisecondsSinceEpoch(
                               conversation.latestMessage.timeStamp)),
-                      style: Styles.date,
+                      style: Theme.of(context).textTheme.caption,
                     )
                   ],
                 ),
@@ -80,7 +78,7 @@ class ChatRowWidget extends StatelessWidget {
     );
   }
 
-  messageContent(Message latestMessage) {
+  messageContent( context, Message latestMessage) {
     if (latestMessage is TextMessage)
       return Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -97,7 +95,7 @@ class ChatRowWidget extends StatelessWidget {
             ),
             Text(
               latestMessage.text,
-              style: Styles.subText,
+              style: Theme.of(context).textTheme.caption,
             )
           ]);
     if (latestMessage is ImageMessage) {
@@ -106,17 +104,17 @@ class ChatRowWidget extends StatelessWidget {
         children: <Widget>[
           latestMessage.isSelf
               ? Icon(
-            Icons.done,
-            size: 12,
-            color: Palette.greyColor,
-          )
+                  Icons.done,
+                  size: 12,
+                  color: Palette.greyColor,
+                )
               : Container(),
           SizedBox(
             width: 2,
           ),
           Icon(
             Icons.camera_alt,
-            size: 12,
+            size: 10,
             color: Palette.greyColor,
           ),
           SizedBox(
@@ -124,7 +122,7 @@ class ChatRowWidget extends StatelessWidget {
           ),
           Text(
             'Photo',
-            style: Styles.subText,
+            style: Theme.of(context).textTheme.caption,
           )
         ],
       );
@@ -135,22 +133,22 @@ class ChatRowWidget extends StatelessWidget {
         children: <Widget>[
           latestMessage.isSelf
               ? Icon(
-            Icons.done,
-            size: 12,
-            color: Palette.greyColor,
-          )
+                  Icons.done,
+                  size: 12,
+                  color: Palette.greyColor,
+                )
               : Container(),
           SizedBox(
             width: 2,
           ),
           Icon(
             Icons.videocam,
-            size: 12,
+            size: 10,
             color: Palette.greyColor,
           ),
           Text(
             'Video',
-            style: Styles.subText,
+            style: Theme.of(context).textTheme.caption,
           )
         ],
       );
@@ -161,22 +159,22 @@ class ChatRowWidget extends StatelessWidget {
         children: <Widget>[
           latestMessage.isSelf
               ? Icon(
-            Icons.done,
-            size: 12,
-            color: Palette.greyColor,
-          )
+                  Icons.done,
+                  size: 12,
+                  color: Palette.greyColor,
+                )
               : Container(),
           SizedBox(
             width: 2,
           ),
           Icon(
             Icons.attach_file,
-            size: 12,
+            size: 10,
             color: Palette.greyColor,
           ),
           Text(
             'File',
-            style: Styles.subText,
+            style: Theme.of(context).textTheme.caption,
           )
         ],
       );

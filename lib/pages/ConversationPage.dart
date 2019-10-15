@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wechat/blocs/chats/Bloc.dart';
-import 'package:wechat/config/Palette.dart';
 import 'package:wechat/models/Chat.dart';
 import 'package:wechat/widgets/ChatAppBar.dart';
 import 'package:wechat/widgets/ChatListWidget.dart';
@@ -41,7 +40,7 @@ class _ConversationPageState extends State<ConversationPage> with AutomaticKeepA
       children: <Widget>[
         Container(
           margin: EdgeInsets.only(top: 100),
-          color: Palette.chatBackgroundColor,
+          color: Theme.of(context).backgroundColor,
           child: ChatListWidget(chat),
         ),
         SizedBox.fromSize(

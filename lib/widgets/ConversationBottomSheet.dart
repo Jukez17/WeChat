@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:wechat/config/Styles.dart';
 import 'package:wechat/widgets/ConversationListWidget.dart';
 
 import 'package:wechat/widgets/NavigationPillWidget.dart';
@@ -18,7 +17,7 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
   Widget build(BuildContext context) {
     return Material(
         child: Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: Theme.of(context).primaryColor,
             body: ListView(children: <Widget>[
               GestureDetector(
                 child: ListView(
@@ -27,13 +26,12 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
                     children: <Widget>[
                       NavigationPillWidget(),
                       Center(
-                          child: Text('Messages', style: Styles.textHeading)),
+                          child: Text('Messages', style: Theme.of(context).textTheme.title)),
                       SizedBox(
                         height: 20,
                       ),
                     ]),
                 onVerticalDragEnd: (details) {
-                  print('Dragged Down');
                   if (details.primaryVelocity > 50) {
                     Navigator.pop(context);
                   }
