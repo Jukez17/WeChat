@@ -4,8 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wechat/blocs/attachments/AttachmentsBloc.dart';
 import 'package:wechat/blocs/chats/Bloc.dart';
 import 'package:wechat/blocs/contacts/Bloc.dart';
+import 'package:wechat/blocs/home/Bloc.dart';
 import 'package:wechat/config/Constants.dart';
-import 'package:wechat/pages/ContactListPage.dart';
+import 'package:wechat/pages/HomePage.dart';
 import 'package:wechat/repositories/AuthenticationRepository.dart';
 import 'package:wechat/repositories/ChatRepository.dart';
 import 'package:wechat/repositories/StorageRepository.dart';
@@ -25,7 +26,6 @@ void main() async {
   SharedObjects.prefs = await CachedSharedPreferences.getInstance();
   Constants.cacheDirPath = (await getTemporaryDirectory()).path;
   Constants.downloadsDirPath = (await DownloadsPathProvider.downloadsDirectory).path;
-
   runApp(MultiBlocProvider(
     providers: [
       BlocProvider<AuthenticationBloc>(
@@ -48,6 +48,9 @@ void main() async {
       ),
       BlocProvider<AttachmentsBloc>(
         builder: (context) => AttachmentsBloc(chatRepository: chatRepository),
+      ),
+      BlocProvider<HomeBloc>(
+        builder: (context) => HomeBloc(chatRepository: chatRepository),
       )
     ],
     child: WeChat(),
@@ -58,7 +61,7 @@ class WeChat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'WeChat',
+      title: 'wechat',
       debugShowCheckedModeBanner: false,
       theme:
           ThemeData(primaryColor: Palette.primaryColor, fontFamily: 'Manrope'),
@@ -69,7 +72,7 @@ class WeChat extends StatelessWidget {
             return RegisterPage();
           } else if (state is ProfileUpdated) {
             BlocProvider.of<ChatBloc>(context).dispatch(FetchChatListEvent());
-            return ContactListPage();
+            return HomePage();
             //  return ConversationPageSlide();
           } else {
             return RegisterPage();

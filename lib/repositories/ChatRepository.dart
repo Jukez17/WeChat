@@ -1,14 +1,18 @@
 import 'dart:async';
 
 import 'package:wechat/models/Chat.dart';
+import 'package:wechat/models/Conversation.dart';
 import 'package:wechat/models/Message.dart';
 import 'package:wechat/models/User.dart';
 import 'package:wechat/providers/BaseProviders.dart';
 import 'package:wechat/providers/ChatProvider.dart';
 
+import 'BaseRepository.dart';
 
-class ChatRepository{
+
+class ChatRepository extends BaseRepository{
   BaseChatProvider chatProvider = ChatProvider();
+  Stream<List<Conversation>> getConversations() => chatProvider.getConversations();
   Stream<List<Chat>> getChats() => chatProvider.getChats();
   Stream<List<Message>> getMessages(String chatId)=> chatProvider.getMessages(chatId);
 
@@ -25,4 +29,9 @@ class ChatRepository{
 
   Future<void> createChatIdForContact(User user) =>
       chatProvider.createChatIdForContact(user);
+
+  @override
+  void dispose() {
+    chatProvider.dispose();
+  }
 }

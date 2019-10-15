@@ -3,9 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wechat/blocs/chats/Bloc.dart';
 import 'package:wechat/models/Chat.dart';
 import 'package:wechat/models/Contact.dart';
+import 'package:wechat/widgets/ConversationBottomSheet.dart';
 import 'package:wechat/widgets/InputWidget.dart';
 import 'package:rubber/rubber.dart';
-import 'ConversationBottomSheet.dart';
+
 import 'ConversationPage.dart';
 
 class ConversationPageSlide extends StatefulWidget {
@@ -80,7 +81,7 @@ class _ConversationPageSlideState extends State<ConversationPageSlide>
                     child: GestureDetector(
                         child: InputWidget(),
                         onPanUpdate: (details) {
-                          if (details.delta.dy < 0) {
+                          if (details.delta.dy < 100) {
                             _scaffoldKey.currentState
                                 .showBottomSheet<Null>((BuildContext context) {
                               return ConversationBottomSheet();

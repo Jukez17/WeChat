@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:wechat/config/Palette.dart';
 import 'package:wechat/config/Styles.dart';
-import 'package:wechat/widgets/ChatRowWidget.dart';
+import 'package:wechat/widgets/ConversationListWidget.dart';
 
 import 'package:wechat/widgets/NavigationPillWidget.dart';
 
@@ -14,6 +13,7 @@ class ConversationBottomSheet extends StatefulWidget {
 }
 
 class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -39,19 +39,7 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
                   }
                 },
               ),
-              ListView.separated(
-                shrinkWrap: true,
-                physics: ClampingScrollPhysics(),
-                itemCount: 5,
-                separatorBuilder: (context, index) => Padding(
-                    padding: EdgeInsets.only(left: 75, right: 20),
-                    child: Divider(
-                      color: Palette.accentColor,
-                    )),
-                itemBuilder: (context, index) {
-                  return ChatRowWidget();
-                },
-              )
+              ConversationListWidget(),
             ])));
   }
 }

@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:wechat/providers/AuthenticationProvider.dart';
 import 'package:wechat/providers/BaseProviders.dart';
+import 'package:wechat/repositories/BaseRepository.dart';
 
-class AuthenticationRepository {
+class AuthenticationRepository extends BaseRepository {
+
   BaseAuthenticationProvider authenticationProvider = AuthenticationProvider();
 
   Future<FirebaseUser> signInWithGoogle() =>
@@ -14,4 +16,9 @@ class AuthenticationRepository {
       authenticationProvider.getCurrentUser();
 
   Future<bool> isLoggedIn() => authenticationProvider.isLoggedIn();
+
+  @override
+  void dispose() {
+    authenticationProvider.dispose();
+  }
 }

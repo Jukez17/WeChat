@@ -11,6 +11,7 @@ import 'package:wechat/config/Styles.dart';
 import 'package:wechat/config/Transitions.dart';
 import 'package:wechat/pages/ContactListPage.dart';
 import 'package:wechat/widgets/CircleIndicator.dart';
+import 'package:wechat/widgets/GradientSnackBar.dart';
 import 'package:wechat/widgets/NumberPicker.dart';
 import 'package:wechat/blocs/authentication/Bloc.dart';
 
@@ -28,6 +29,7 @@ class _RegisterPageState extends State<RegisterPage>
   //fields for the form
   File profileImageFile;
   ImageProvider profileImage;
+  ImageProvider placeHolderImage = Image.asset(Assets.user).image;
   int age = 18;
   final TextEditingController usernameController = TextEditingController();
 
@@ -184,7 +186,7 @@ class _RegisterPageState extends State<RegisterPage>
           child: Image.asset(Assets.app_icon_fg, height: 100)),
       Container(
           margin: EdgeInsets.only(top: 30),
-          child: Text('WeChat Messenger',
+          child: Text('wechat Messenger',
               style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -219,11 +221,12 @@ class _RegisterPageState extends State<RegisterPage>
     }, child: Container(
       child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
         builder: (context, state) {
-          profileImage = Image.asset(Assets.user).image;
+          profileImage = placeHolderImage;
           if (state is PreFillData) {
             age = state.user.age != null ? state.user.age : 18;
-            if(state.user.photoUrl!=null)
+            if (state.user.photoUrl != null) {
               profileImage = Image.network(state.user.photoUrl).image;
+            }
           } else if (state is ReceivedProfilePicture) {
             profileImageFile = state.file;
             profileImage = Image.file(profileImageFile).image;
@@ -397,8 +400,18 @@ class _RegisterPageState extends State<RegisterPage>
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
                 FloatingActionButton(
-                  onPressed: () => authenticationBloc.dispatch(SaveProfile(
-                      profileImageFile, age, usernameController.text)),
+                  onPressed: () => {
+
+                    if ((profileImageFile != null || profileImage != placeHolderImage) &&
+                        age != null &&
+                        usernameController.text.isNotEmpty){
+                        authenticationBloc.dispatch(SaveProfile(
+                            profileImageFile, age, usernameController.text))
+                      }
+                    else {
+                        GradientSnackBar.showError(context, 'Please fill all details')
+                      }
+                  },
                   elevation: 0,
                   backgroundColor: Palette.primaryColor,
                   child: Icon(
