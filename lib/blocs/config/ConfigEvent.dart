@@ -20,3 +20,8 @@ class UpdateProfilePicture extends ConfigEvent{
   @override
   String toString() => 'UpdateProfilePicture';
 }
+
+class RestartApp extends ConfigEvent{
+  @override
+  String toString() => 'RestartApp';
+}

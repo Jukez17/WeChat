@@ -86,7 +86,7 @@ class _ChatAppBarState extends State<ChatAppBar> {
                     spreadRadius: 0.1)
               ]),
               child: Container(
-                  padding: EdgeInsets.only(top: 10, bottom: 6),
+                  padding: EdgeInsets.only(top: 10, bottom: 7),
                   color: Theme.of(context).primaryColor,
                   child: Row(children: <Widget>[
                     Expanded(

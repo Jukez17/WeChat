@@ -67,6 +67,7 @@ void main() async {
 // ignore: must_be_immutable
 class WeChat extends StatelessWidget {
   ThemeData theme;
+  Key key = UniqueKey();
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +76,9 @@ class WeChat extends StatelessWidget {
         theme = SharedObjects.prefs.getBool(Constants.configDarkMode)
             ? Themes.dark
             : Themes.light;
+      }
+      if(state is RestartedAppState){
+        key = UniqueKey();
       }
       if (state is ConfigChangeState && state.key == Constants.configDarkMode) {
         theme = state.value ? Themes.dark : Themes.light;

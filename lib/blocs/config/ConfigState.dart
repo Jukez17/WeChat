@@ -20,3 +20,7 @@ class ProfilePictureChangedState extends ConfigState{
   @override
   String toString()=> 'ProfilePictureChangedState {profilePictureUrl: $profilePictureUrl}';
 }
+
+class RestartedAppState extends ConfigState{
+  RestartedAppState():super([]);
+}

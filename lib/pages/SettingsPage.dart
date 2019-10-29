@@ -4,6 +4,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:wechat/blocs/authentication/authentication_bloc.dart';
+import 'package:wechat/blocs/authentication/authentication_event.dart';
 import 'package:wechat/blocs/config/Bloc.dart';
 import 'package:wechat/config/Assets.dart';
 import 'package:wechat/config/Constants.dart';
@@ -294,7 +296,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         'SIGN OUT',
                         style: Theme.of(context).textTheme.button,
                       ),
-                      onPressed: () {
+                        onPressed: ()  => {BlocProvider.of<AuthenticationBloc>(context).dispatch(ClickedLogout()),
+                      configBloc.dispatch(RestartApp())
                       },
                       shape: RoundedRectangleBorder(
                           borderRadius: new BorderRadius.circular(30.0))),
